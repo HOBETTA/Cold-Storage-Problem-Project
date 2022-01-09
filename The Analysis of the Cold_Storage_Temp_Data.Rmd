@@ -1,0 +1,101 @@
+---
+output:
+  word_document: default
+  html_document: default
+---
+
+***Project***
+## The Analysis of the Cold_Storage_Temp_Data
+## By Chinedu.H. Obetta of Great Learning Academy
+
+*** Part One***
+## Setting up the working directory and Upload data into R using CSV file
+
+```{r}
+library(readr)
+Cold_Storage_Temp_Data<-read.csv("Cold_Storage_Temp_Data.csv", header = TRUE)
+dim(Cold_Storage_Temp_Data)
+attach(Cold_Storage_Temp_Data)
+head(Cold_Storage_Temp_Data, 4)
+
+```
+##1.	Find mean cold storage temperature for Summer, Winter and Rainy Season
+** The by function will be used to determine the average cold storage temperature for each of the seasons
+```{r}
+attach(Cold_Storage_Temp_Data)
+summary(Temperature)
+boxplot(Temperature, horizontal = TRUE, title = "Box Plot For Temperature")
+hist(Temperature)
+by(Temperature, INDICES = Season, FUN = mean)
+```
+
+##2 To determine the  overall mean and Standard Deviation for the full year
+
+```{r}
+Overall_mean <- mean(Temperature)
+Overall_Std <- sd(Temperature)
+Overall_Std   
+Overall_mean
+```
+
+##3&4 The probability of temperature having fallen below 2 C and the probability of temperature having gone above 4 C?
+```{r}
+Prob_Less_Than_2c<-pnorm(2, mean = Overall_mean, sd=Overall_Std)
+Prob_Greater_Than_4c<- 1-pnorm(4, mean = Overall_mean, sd=Overall_Std)
+print(Prob_Less_Than_2c)
+print(Prob_Greater_Than_4c)
+```
+##6.Perform a one-way ANOVA test to determine if there is a significant difference in Cold Storage temperature between rainy, summer and winter seasons and comment on the findings.
+#Step1 
+
+```{r}
+summary(Temperature)
+hist(Temperature)
+boxplot(Temperature, horizontal = TRUE)
+```
+
+#Step2: Frequency counts and mean of the COld Storage Temperature at different season
+```{r}
+table(Season)
+tapply(Temperature, Season, mean)
+```
+
+#Step 3: Box Plot analysis of season
+
+```{r}
+library(ggplot2)
+ggplot(Cold_Storage_Temp_Data, aes(x = Season, y = Temperature, color=Season)) +
+geom_boxplot()
+```
+#step 4-Test for Normality
+
+```{r}
+shapiro.test(Temperature)
+```
+
+#Step 5: Test of Homogeneity of Variance for ANOVA
+```{r}
+
+library(Rcmdr) # for Levene test for homegeneity of variance
+leveneTest(Temperature~Season, Cold_Storage_Temp_Data)
+```
+
+***Part 2** 
+```{r}
+Cold_Storage_Mar2018<-read.csv("Cold_Storage_Mar2018.csv")
+head(Cold_Storage_Mar2018, 20)
+```
+## The summary of the data is shown below
+```{r}
+summary(Cold_Storage_Mar2018)
+hist(Cold_Storage_Mar2018$Temperature)
+boxplot(Cold_Storage_Mar2018$Temperature)
+```
+
+### 2.2 Question/State the Hypothesis, perform hypothesis test and determine p-value. T.test will be applied since population mean and sd are unknown
+
+```{r}
+t.test(Cold_Storage_Mar2018$Temperature, alternative = "greater", mu=3.9)
+
+```
+ ***END***
